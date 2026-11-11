@@ -33,6 +33,13 @@ export default function App() {
   const [busy, setBusy] = useState(false)
   const [editMode, setEditMode] = useState(false) // maujooda text edit mode
   const [convOpen, setConvOpen] = useState(false)
+  const [path, setPath] = useState(window.location.pathname) // page ka URL (/merge-pdf wagera)
+  const navigate = p => { window.history.pushState(null, '', p); setPath(p); window.scrollTo(0, 0) }
+  useEffect(() => {
+    const onPop = () => setPath(window.location.pathname)
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
   const imgInput = useRef()
   const objsRef = useRef(objs)
   objsRef.current = objs
@@ -162,7 +169,7 @@ export default function App() {
 
   const dialog = <ConvertDialog open={convOpen} busy={busy} onFrom={exportAs} onTo={importAs} onClose={() => setConvOpen(false)} />
 
-  if (!doc) return <Home busy={busy} onEdit={openFile} onFrom={exportAs} onTo={importAs} onTool={runTool} />
+  if (!doc) return <Home busy={busy} path={path} navigate={navigate} onEdit={openFile} onFrom={exportAs} onTo={importAs} onTool={runTool} />
 
   return (
     <div className="app">

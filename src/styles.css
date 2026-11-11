@@ -85,3 +85,19 @@ body { margin:0; font-family: system-ui, "Segoe UI", Roboto, sans-serif; color:v
 .field input, .field select { font:inherit; padding:8px 10px; border:1px solid var(--line); border-radius:6px; }
 .files { font-size:.85rem; color:#5b6673; line-height:1.5; word-break:break-word; }
 .row { display:flex; justify-content:flex-end; gap:8px; margin-top:6px; }
+
+/* ---- SEO tool pages ---- */
+.nav a { font-weight:600; font-size:.92rem; color:var(--ink); text-decoration:none; padding:6px 0; }
+.nav a:hover { color:#3b5bdb; }
+.nav a.logo { color:#3b5bdb; font-weight:800; font-size:1.3rem; letter-spacing:-.02em; margin-right:8px; }
+a.tool { text-decoration:none; }
+.page-wrap { width:min(820px,100%); margin:0 auto; padding:40px 24px 56px; flex:1; }
+.page-wrap h1 { font-size:clamp(1.8rem,4vw,2.5rem); letter-spacing:-.02em; margin:0 0 10px; }
+.page-wrap h2 { margin:30px 0 10px; font-size:1.3rem; }
+.page-wrap h3 { margin:16px 0 4px; font-size:1rem; }
+.page-wrap p, .page-wrap li { color:#4a5563; line-height:1.6; }
+.lead { margin:0 0 24px; }
+.toolbox { margin-bottom:12px; }
+.card.inline { width:100%; box-shadow:0 8px 24px rgba(27,36,48,.1); }
+.flinks { display:flex; flex-wrap:wrap; justify-content:center; gap:6px 16px; margin-bottom:12px; }
+.flinks a { color:#4a5563; font-size:.85rem; }

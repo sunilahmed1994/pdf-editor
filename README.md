@@ -41,3 +41,11 @@ Browser me chalne wala PDF editor. Login nahi, server nahi: file user ke browser
 - Behtar quality ke liye baad me backend (LibreOffice) lagana parega
 - PDF se Word: tables (aapas me aligned text) asli Word tables ban jati hain, page size/margin, indent aur center/right alignment bhi bachte hain. Bold/rang, pictures, merged cells aur multi-column layout abhi nahi bachte
 - Word/Excel conversion ke liye backend chahiye
+
+## SEO (search engine ranking)
+- Har tool ka apna URL hai (/merge-pdf, /pdf-to-word wagera). Title, description, content, FAQ aur JSON-LD src/seo.js me hain.
+- `npm run build` ke baad scripts/prerender.mjs har page ki asli HTML, sitemap.xml aur robots.txt dist me bana deta hai.
+- Apna asli domain dene ke liye hosting me environment variable SITE_URL set karen (jaise https://aapkadomain.com). Warna sitemap me https://example.com rahega.
+- Naya tool page jodne ke liye: src/catalog.js me card, src/seo.js me page entry.
+- Live hone ke baad Google Search Console aur Bing Webmaster Tools me site add karke sitemap.xml submit karen.
+- Hosting par har /slug ka alag index.html chahiye hota hai, jo prerender script khud banata hai.

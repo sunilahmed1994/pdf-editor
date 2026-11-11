@@ -1,17 +1,27 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { CATS, CATC, TOOLS } from './catalog.js'
+import { PAGES, HOME, pageMeta } from './seo.js'
 import ToolDialog from './ToolDialog.jsx'
 
-export default function Home({ busy, onEdit, onFrom, onTo, onTool }) {
+const slugOf = id => PAGES.find(p => p.id === id)?.slug
+
+export default function Home({ busy, path, navigate, onEdit, onFrom, onTo, onTool }) {
   const [cat, setCat] = useState('all')
-  const [tool, setTool] = useState(null)
   const input = useRef()
   const pending = useRef(null)
+  const slug = path.replace(/^\/|\/$/g, '')
+  const page = PAGES.find(p => p.slug === slug)
+  const tool = page && TOOLS.find(t => t.id === page.id)
+  const meta = page ? pageMeta(page) : HOME
   const shown = TOOLS.filter(t => cat === 'all' || t.cat === cat)
 
-  const click = t => {
-    if (!t.ready || busy) return
-    if (t.kind === 'tool') return setTool(t)
+  useEffect(() => {
+    document.title = meta.title
+    document.querySelector('meta[name="description"]')?.setAttribute('content', meta.description)
+  }, [meta.title])
+
+  const go = (e, p, after) => { e.preventDefault(); navigate(p); after?.() }
+  const pickFile = t => {
     pending.current = t
     input.current.accept = t.accept
     input.current.multiple = !!t.multi
@@ -26,41 +36,69 @@ export default function Home({ busy, onEdit, onFrom, onTo, onTool }) {
     else if (t.kind === 'from') onFrom(t.key, f[0])
     else onTo(t.key, f)
   }
-  const go = id => click(TOOLS.find(t => t.id === id))
 
   return (
-    <div className="home" onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (e.dataTransfer.files[0]) onEdit(e.dataTransfer.files[0]) }}>
+    <div className="home" onDragOver={e => e.preventDefault()}
+         onDrop={e => { e.preventDefault(); if (!page && e.dataTransfer.files[0]) onEdit(e.dataTransfer.files[0]) }}>
       <nav className="nav">
-        <span className="logo">PDF Editor</span>
-        <button onClick={() => go('merge')}>Merge PDF</button>
-        <button onClick={() => go('split')}>Split PDF</button>
-        <button onClick={() => go('edit')}>Edit PDF</button>
-        <button onClick={() => setCat('convert')}>Convert PDF</button>
-        <button onClick={() => setCat('all')}>All tools</button>
+        <a className="logo" href="/" onClick={e => go(e, '/')}>PDF Editor</a>
+        <a href="/merge-pdf" onClick={e => go(e, '/merge-pdf')}>Merge PDF</a>
+        <a href="/split-pdf" onClick={e => go(e, '/split-pdf')}>Split PDF</a>
+        <a href="/edit-pdf" onClick={e => go(e, '/edit-pdf')}>Edit PDF</a>
+        <a href="/" onClick={e => go(e, '/', () => setCat('convert'))}>Convert PDF</a>
+        <a href="/" onClick={e => go(e, '/', () => setCat('all'))}>All tools</a>
         <span className="grow" />
         <span className="free">100% free · no login required</span>
       </nav>
-      <header className="hero">
-        <h1>Every PDF tool, in one place</h1>
-        <p>Merge, split, edit, convert and more. No login needed, and your files never leave your browser. You can also drag a PDF here to start editing right away.</p>
-      </header>
-      <div className="tabs">
-        {CATS.map(([id, label]) => <button key={id} className={'tab' + (cat === id ? ' on' : '')} onClick={() => setCat(id)}>{label}</button>)}
-      </div>
-      <main className="tools">
-        {shown.map(t => (
-          <button key={t.id} className={'tool' + (t.ready ? '' : ' soon')} onClick={() => click(t)} disabled={busy && t.ready}>
-            <span className="ico" style={{ background: CATC[t.cat] }}>{t.icon}</span>
-            <strong>{t.title}</strong>
-            <span className="d">{t.desc}</span>
-            {!t.ready && <em className="badge soon">Coming soon</em>}
-          </button>
-        ))}
-      </main>
+
+      {page ? (
+        <main className="page-wrap">
+          <h1>{meta.h1}</h1>
+          <p className="lead">{meta.intro}</p>
+          <div className="toolbox">
+            {tool.kind === 'tool'
+              ? <ToolDialog key={tool.id} inline tool={tool} busy={busy} onRun={onTool} onClose={() => navigate('/')} />
+              : <button className="btn primary big" onClick={() => pickFile(tool)} disabled={busy}>{tool.multi ? 'Choose images' : tool.kind === 'to' ? 'Choose file' : 'Choose PDF file'}</button>}
+          </div>
+          <h2>How to use {page.name}</h2>
+          <ol>{meta.steps.map(s => <li key={s}>{s}</li>)}</ol>
+          <h2>Frequently asked questions</h2>
+          {meta.faq.map(([q, a]) => <div key={q}><h3>{q}</h3><p>{a}</p></div>)}
+        </main>
+      ) : (
+        <>
+          <header className="hero">
+            <h1>{HOME.h1}</h1>
+            <p>{HOME.intro} You can also drag a PDF here to start editing right away.</p>
+          </header>
+          <div className="tabs">
+            {CATS.map(([id, label]) => <button key={id} className={'tab' + (cat === id ? ' on' : '')} onClick={() => setCat(id)}>{label}</button>)}
+          </div>
+          <main className="tools">
+            {shown.map(t => {
+              const inner = (
+                <>
+                  <span className="ico" style={{ background: CATC[t.cat] }}>{t.icon}</span>
+                  <strong>{t.title}</strong>
+                  <span className="d">{t.desc}</span>
+                  {!t.ready && <em className="badge soon">Coming soon</em>}
+                </>
+              )
+              const s = slugOf(t.id)
+              return t.ready && s
+                ? <a key={t.id} className="tool" href={'/' + s} onClick={e => go(e, '/' + s)}>{inner}</a>
+                : <div key={t.id} className="tool soon">{inner}</div>
+            })}
+          </main>
+        </>
+      )}
+
       <input ref={input} type="file" hidden onChange={picked} />
       {busy && <div className="toast">Working, please wait...</div>}
-      {tool && <ToolDialog key={tool.id} tool={tool} busy={busy} onRun={onTool} onClose={() => setTool(null)} />}
-      <footer className="foot">All files are processed in your browser and are never uploaded to a server.</footer>
+      <footer className="foot">
+        <div className="flinks">{PAGES.map(p => <a key={p.slug} href={'/' + p.slug} onClick={e => go(e, '/' + p.slug)}>{p.name}</a>)}</div>
+        All files are processed in your browser and are never uploaded to a server.
+      </footer>
     </div>
   )
 }

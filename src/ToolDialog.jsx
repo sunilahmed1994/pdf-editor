@@ -23,18 +23,19 @@ const F = {
   ]
 }
 
-export default function ToolDialog({ tool, busy, onRun, onClose }) {
+export default function ToolDialog({ tool, busy, onRun, onClose, inline }) {
   const fields = F[tool.id] || []
   const [files, setFiles] = useState([])
   const [o, setO] = useState(() => Object.fromEntries(fields.map(f => [f.k, f.def ?? ''])))
   const merge = tool.id === 'merge'
   const ok = merge ? files.length >= 2 : files.length >= 1
-  const go = async () => { await onRun(tool.id, files, o); onClose() }
-  return (
-    <div className="modal" onClick={busy ? undefined : onClose}>
-      <div className="card" onClick={e => e.stopPropagation()}>
-        <h2>{tool.title}</h2>
-        <p className="muted">{tool.desc}</p>
+  const go = async () => { await onRun(tool.id, files, o); if (!inline) onClose() }
+  const wrap = kids => inline
+    ? <div className="card inline">{kids}</div>
+    : <div className="modal" onClick={busy ? undefined : onClose}><div className="card" onClick={e => e.stopPropagation()}>{kids}</div></div>
+  return wrap(
+      <>
+        {!inline && <><h2>{tool.title}</h2><p className="muted">{tool.desc}</p></>}
         <label className="btn">{merge ? 'Add PDF files' : files.length ? 'Choose again' : 'Choose PDF'}
           <input type="file" hidden accept="application/pdf" multiple={merge}
                  onChange={e => { const n = [...e.target.files]; e.target.value = ''; setFiles(merge ? [...files, ...n] : n) }} />
@@ -51,10 +52,9 @@ export default function ToolDialog({ tool, busy, onRun, onClose }) {
           </label>
         ))}
         <div className="row">
-          <button className="btn" onClick={onClose} disabled={busy}>Close</button>
+          {!inline && <button className="btn" onClick={onClose} disabled={busy}>Close</button>}
           <button className="btn primary" onClick={go} disabled={!ok || busy}>{busy ? 'Please wait...' : 'Start'}</button>
         </div>
-      </div>
-    </div>
+      </>
   )
 }
