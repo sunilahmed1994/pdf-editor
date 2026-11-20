@@ -4,7 +4,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { PAGES, HOME, SITE_NAME, pageMeta, jsonLd } from '../src/seo.js'
 
-const SITE = (process.env.SITE_URL || 'https://example.com').replace(/\/$/, '')
+const SITE = (process.env.SITE_URL || 'https://freepdfeditoronline.vercel.app').replace(/\/$/, '')
 const dist = path.resolve('dist')
 const tpl = fs.readFileSync(path.join(dist, 'index.html'), 'utf8')
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
