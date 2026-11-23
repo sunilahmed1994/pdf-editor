@@ -49,3 +49,19 @@ Browser me chalne wala PDF editor. Login nahi, server nahi: file user ke browser
 - Naya tool page jodne ke liye: src/catalog.js me card, src/seo.js me page entry.
 - Live hone ke baad Google Search Console aur Bing Webmaster Tools me site add karke sitemap.xml submit karen.
 - Hosting par har /slug ka alag index.html chahiye hota hai, jo prerender script khud banata hai.
+
+- 
+# Free PDF Editor Online
+
+A free online PDF editing tool that helps users manage and edit PDF documents easily.
+
+Visit our website:
+
+[Free PDF Editor Online](https://freepdfeditoronline.vercel.app/)
+
+Features:
+- Online PDF editing
+- Easy PDF management
+- Free PDF tools
+- No complicated installation required
+
