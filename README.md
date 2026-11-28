@@ -3,7 +3,7 @@
 
 A free, browser-based PDF editor built with React and Vite. Edit, convert, merge, split, rotate, and manage PDF documents directly in your browser without creating an account.
 
-🌐 **Live Website:** https://freepdfeditoronline.vercel.app/
+🌐 **Live Website:** https://youlovepdfedit.vercel.app/
 
 ## Features
 
